@@ -38,6 +38,12 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
   @BindView(R.id.seek_bar) AppCompatSeekBar seekBar;
   @BindView(R.id.time_text_view) TextView timeTextView;
 
+  Runnable updateProgressRunnable = new Runnable() {
+    @Override public void run() {
+      updatePlayerTime();
+    }
+  };
+
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
@@ -105,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
   }
 
   @Override public void onTimelineChanged(Timeline timeline, Object manifest) {
-
+    updatePlayerTime();
   }
 
   @Override
@@ -138,9 +144,30 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
     exoPlayerStateTextView.setText(
         "Play when ready: " + playWhenReady + "\tPlayback State: " + playbackStateString);
 
-    seekBar.setMax((int) exoPlayer.getDuration());
+    updatePlayerTime();
+  }
 
-    timeTextView.setText("Duration in ms: " + exoPlayer.getDuration());
+  private void updatePlayerTime() {
+    seekBar.setMax((int) exoPlayer.getDuration());
+    seekBar.setProgress((int) exoPlayer.getCurrentPosition());
+    timeTextView.setText("Current Position: "
+        + exoPlayer.getCurrentPosition()
+        + "\tDuration in ms: "
+        + exoPlayer.getDuration());
+
+    // Cancel any pending updates and schedule a new one if necessary.
+    seekBar.removeCallbacks(updateProgressRunnable);
+    int playbackState = exoPlayer == null ? ExoPlayer.STATE_IDLE : exoPlayer.getPlaybackState();
+    if (playbackState != ExoPlayer.STATE_IDLE && playbackState != ExoPlayer.STATE_ENDED) {
+      seekBar.postDelayed(updateProgressRunnable, 200);
+    }
+  }
+
+  @Override protected void onPause() {
+    super.onPause();
+
+    // TODO Doing this here is a bug for multi-window
+    seekBar.removeCallbacks(updateProgressRunnable);
   }
 
   @Override public void onPlayerError(ExoPlaybackException error) {
@@ -148,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
   }
 
   @Override public void onPositionDiscontinuity() {
-
+    updatePlayerTime();
   }
 
   @Override public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {

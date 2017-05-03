@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
@@ -33,7 +34,9 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
   SimpleExoPlayer exoPlayer;
   EventLogger eventLogger;
   Handler mainHandler;
-  @BindView(R.id.exo_state_TextView) TextView exoPlayerStateTextView;
+  @BindView(R.id.exo_state_text_view) TextView exoPlayerStateTextView;
+  @BindView(R.id.seek_bar) AppCompatSeekBar seekBar;
+  @BindView(R.id.time_text_view) TextView timeTextView;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -56,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
     onPlayerStateChanged(exoPlayer.getPlayWhenReady(), exoPlayer.getPlaybackState());
   }
 
-  @OnClick(R.id.init_player_Button) void initializePlayer() {
+  @OnClick(R.id.init_player_button) void initializePlayer() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
           != PackageManager.PERMISSION_GRANTED) {
@@ -134,6 +137,10 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
 
     exoPlayerStateTextView.setText(
         "Play when ready: " + playWhenReady + "\tPlayback State: " + playbackStateString);
+
+    seekBar.setMax((int) exoPlayer.getDuration());
+
+    timeTextView.setText("Duration in ms: " + exoPlayer.getDuration());
   }
 
   @Override public void onPlayerError(ExoPlaybackException error) {

@@ -83,15 +83,31 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
     exoPlayer.setMetadataOutput(eventLogger);
     exoPlayer.setPlayWhenReady(false);
 
-    File songFile = new File("/sdcard/Music/Music/Tory Lanez/Say It/01 Say It.mp3");
+    File drakkarNoirFile = new File("/sdcard/Music/Music/Phoenix/Bankrupt!/06 Drakkar Noir.mp3");
 
-    Uri songUri = Uri.fromFile(songFile);
+    Uri drakkarNoirUri = Uri.fromFile(drakkarNoirFile);
 
-    MediaSource mediaSource =
-        new ExtractorMediaSource(songUri, new DefaultDataSourceFactory(this, "Dummy User Agent"),
+    MediaSource drakkarNoirMediaSource = new ExtractorMediaSource(drakkarNoirUri,
+        new DefaultDataSourceFactory(this, getString(R.string.app_name)),
             new DefaultExtractorsFactory(), mainHandler, eventLogger);
 
+    File chloroformFile = new File("/sdcard/Music/Music/Phoenix/Bankrupt!/07 Chloroform.mp3");
+
+    Uri chloroformUri = Uri.fromFile(chloroformFile);
+
+    final MediaSource chloroformMediaSource = new ExtractorMediaSource(chloroformUri,
+        new DefaultDataSourceFactory(this, getString(R.string.app_name)), new DefaultExtractorsFactory(),
+        mainHandler, eventLogger);
+
+    final AppendingMediaSource mediaSource = new AppendingMediaSource(drakkarNoirMediaSource);
     exoPlayer.prepare(mediaSource);
+
+    seekBar.postDelayed(new Runnable() {
+      @Override public void run() {
+        mediaSource.appendSource(exoPlayer, chloroformMediaSource);
+      }
+    }, 1000);
+
     seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
       @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (fromUser) {

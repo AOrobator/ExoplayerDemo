@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     exoPlayer.addListener(eventLogger);
     exoPlayer.setAudioDebugListener(eventLogger);
     exoPlayer.setMetadataOutput(eventLogger);
-    exoPlayer.setPlayWhenReady(true);
+    exoPlayer.setPlayWhenReady(false);
 
     File songFile = new File("/sdcard/Music/Music/Tory Lanez/Say It/01 Say It.mp3");
 
@@ -69,6 +69,14 @@ public class MainActivity extends AppCompatActivity {
             new DefaultExtractorsFactory(), mainHandler, eventLogger);
 
     exoPlayer.prepare(mediaSource);
+  }
+
+  @OnClick(R.id.pause_button) void pauseExoPlayer() {
+    exoPlayer.setPlayWhenReady(false);
+  }
+
+  @OnClick(R.id.play_button) void playExoPlayer() {
+    exoPlayer.setPlayWhenReady(true);
   }
 
   @Override public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,

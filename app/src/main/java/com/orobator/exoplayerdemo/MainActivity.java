@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSeekBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import butterknife.BindView;
@@ -91,6 +92,21 @@ public class MainActivity extends AppCompatActivity implements ExoPlayer.EventLi
             new DefaultExtractorsFactory(), mainHandler, eventLogger);
 
     exoPlayer.prepare(mediaSource);
+    seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+      @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser) {
+          exoPlayer.seekTo(progress);
+        }
+      }
+
+      @Override public void onStartTrackingTouch(SeekBar seekBar) {
+
+      }
+
+      @Override public void onStopTrackingTouch(SeekBar seekBar) {
+
+      }
+    });
   }
 
   @OnClick(R.id.pause_button) void pauseExoPlayer() {
